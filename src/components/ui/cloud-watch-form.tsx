@@ -53,21 +53,28 @@ export default function CloudWatchForm() {
     setLoading(true);
 
     try {
+      console.log('Submitting form data:', formData);
+      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+
       const { data, error } = await supabase
         .from('bookings')
         .insert([
           {
             name: formData.name,
             email: formData.email,
-            interest: formData.interest,
-            message: formData.message,
-            status: 'pending',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            interest: formData.interest || null,
+            message: formData.message || null,
+            status: 'pending'
           }
         ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Success! Data inserted:', data);
 
       // Reset form
       setFormData({
@@ -80,7 +87,7 @@ export default function CloudWatchForm() {
       alert('Successfully joined the waitlist!');
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Error submitting form. Please try again.');
+      alert(`Error submitting form: ${error.message || 'Please try again.'}`);
     } finally {
       setLoading(false);
     }
