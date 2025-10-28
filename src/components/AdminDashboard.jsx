@@ -157,6 +157,7 @@ const AdminDashboard = ({ onLogout }) => {
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Interest</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Message</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
@@ -174,6 +175,7 @@ const AdminDashboard = ({ onLogout }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-white">{booking.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-300">{booking.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-300">{booking.interest || 'General'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-300 max-w-xs truncate">{booking.message || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-300">
                       {new Date(booking.created_at).toLocaleDateString()}
                     </td>

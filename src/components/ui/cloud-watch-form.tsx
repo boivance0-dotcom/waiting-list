@@ -5,12 +5,20 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { Label } from "./label";
 import { GradientButton } from "./gradient-button";
+import { supabase } from "../../lib/supabase";
 
 export default function CloudWatchForm() {
   const [isTyping, setIsTyping] = useState(false);
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [eyePos, setEyePos] = useState({ x: 0, y: 0 });
   const [blink, setBlink] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    interest: '',
+    message: ''
+  });
 
   useEffect(() => {
     const handleMouse = (e) => setCursor({ x: e.clientX, y: e.clientY });
@@ -32,6 +40,51 @@ export default function CloudWatchForm() {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            interest: formData.interest,
+            message: formData.message,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ]);
+
+      if (error) throw error;
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        interest: '',
+        message: ''
+      });
+
+      alert('Successfully joined the waitlist!');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Error submitting form. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
@@ -84,28 +137,49 @@ export default function CloudWatchForm() {
         <div className="w-full flex flex-col gap-4">
           <div className="flex flex-col">
             <Label>Name</Label>
-            <Input placeholder="Your Name" />
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Your Name"
+            />
           </div>
           <div className="flex flex-col">
             <Label>Email</Label>
-            <Input type="email" placeholder="Your Email" />
-          </div>
-          <div className="flex flex-col">
-            <Label>Username</Label>
-            <Input placeholder="Username" />
-          </div>
-          <div className="flex flex-col">
-            <Label>Password</Label>
             <Input
-              type="password"
-              placeholder="Password"
-              onFocus={() => setIsTyping(true)}
-              onBlur={() => setIsTyping(false)}
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="Your Email"
+            />
+          </div>
+          <div className="flex flex-col">
+            <Label>Interest</Label>
+            <Input
+              name="interest"
+              value={formData.interest}
+              onChange={handleInputChange}
+              placeholder="What interests you about Biovance?"
+            />
+          </div>
+          <div className="flex flex-col">
+            <Label>Message (Optional)</Label>
+            <Input
+              name="message"
+              value={formData.message}
+              onChange={handleInputChange}
+              placeholder="Any additional message..."
             />
           </div>
           <div className="mt-6">
-            <GradientButton variant="variant" className="w-full">
-              Join Waitlist
+            <GradientButton
+              variant="variant"
+              className="w-full"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? 'Submitting...' : 'Join Waitlist'}
             </GradientButton>
           </div>
         </div>
