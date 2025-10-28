@@ -18,16 +18,24 @@ const AdminDashboard = ({ onLogout }) => {
 
   const fetchBookings = async () => {
     try {
+      console.log('Fetching bookings...');
+      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Bookings fetched:', data);
       setBookings(data || []);
     } catch (error) {
       console.error('Error fetching bookings:', error);
-      showToast('Error loading bookings', 'error');
+      showToast(`Error loading bookings: ${error.message || 'Unknown error'}`, 'error');
     } finally {
       setLoading(false);
     }
